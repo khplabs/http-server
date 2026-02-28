@@ -56,27 +56,38 @@ void Server::accept_connections() {
             continue;
         }
 
-        char buffer[1024]{};
-        read(client_fd, buffer, sizeof(buffer) - 1);
+        bool keep_alive = true;
 
-        // Parse the raw request.
-        HttpParser parser;
-        HttpRequest request = parser.parse(std::string(buffer));
+        while (keep_alive) {
+            char buffer[1024]{};
+            ssize_t bytes_read = read(client_fd, buffer, sizeof(buffer) - 1);
 
-        std::cout << "Method: " << request.method
-                  << " Path: " << request.path << "\n";
+            if (bytes_read <= 0) break;
 
-        // Build and send a response.
-        HttpResponse response;
-        std::string body;
+            HttpParser parser;
+            HttpRequest request = parser.parse(std::string(buffer));
 
-        if (request.path == "/") {
-            body = "<html><body><h1>Hello from your HTTP server</h1></body></html>";
-            std::string raw = response.build(200, body);
-            write(client_fd, raw.c_str(), raw.size());
-        } else {
-            body = "<html><body><h1>404 Not Found</h1></body></html>";
-            std::string raw = response.build(404, body);
+            std::cout << "Method: " << request.method
+                      << " Path: " << request.path << "\n";
+
+            auto it = request.headers.find("connection");
+            if (it != request.headers.end() && it->second == "close") {
+                keep_alive = false;
+            }
+            
+            // Build and send a response.
+            HttpResponse response;
+            std::string body;
+            std::string raw;
+
+            if (request.path == "/") {
+                body = "<html><body><h1>Hello from your HTTP server</h1></body></html>";
+                raw = response.build(200, body, keep_alive);
+            } else {
+                body = "<html><body><h1>404 Not Found</h1></body></html>";
+                raw = response.build(404, body, keep_alive);
+            }
+
             write(client_fd, raw.c_str(), raw.size());
         }
 

@@ -1,6 +1,6 @@
 #include "http_response.h"
 
-std::string HttpResponse::build(int status_code, const std::string& body) {
+std::string HttpResponse::build(int status_code, const std::string& body, bool keep_alive) {
     // An HTTP/1.1 response looks like this:
     //
     // HTTP/1.1 200 OK\r\n
@@ -16,7 +16,13 @@ std::string HttpResponse::build(int status_code, const std::string& body) {
     response += "HTTP/1.1 " + std::to_string(status_code) + " " + status_text(status_code) + "\r\n";
     response += "Content-Type: text/html\r\n";
     response += "Content-Length: " + std::to_string(body.size()) + "\r\n";
-    response += "Connection: close\r\n";
+
+    if (keep_alive) {
+        response += "Connection: keep-alive\r\n";
+    } else {
+        response += "Connection: close\r\n";
+    }
+    
     response += "\r\n";
     response += body;
     return response;
