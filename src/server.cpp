@@ -56,41 +56,46 @@ void Server::accept_connections() {
             continue;
         }
 
-        bool keep_alive = true;
+        std::lock_guard<std::mutex> lock(threads_mutex);
+        threads.emplace_back(&Server::client_handler, this, client_fd);
+        threads.back().detach();
+    }
+}
 
-        while (keep_alive) {
-            char buffer[1024]{};
-            ssize_t bytes_read = read(client_fd, buffer, sizeof(buffer) - 1);
+void Server::client_handler(int client_fd) {
+    bool keep_alive = true;
 
-            if (bytes_read <= 0) break;
+    while (keep_alive) {
+        char buffer[1024]{};
+        ssize_t bytes_read = read(client_fd, buffer, sizeof(buffer) - 1);
 
-            HttpParser parser;
-            HttpRequest request = parser.parse(std::string(buffer));
+        if (bytes_read <= 0) break;
 
-            std::cout << "Method: " << request.method
-                      << " Path: " << request.path << "\n";
+        HttpParser parser;
+        HttpRequest request = parser.parse(std::string(buffer));
 
-            auto it = request.headers.find("connection");
-            if (it != request.headers.end() && it->second == "close") {
-                keep_alive = false;
-            }
+        std::cout << "[thread " << std::this_thread::get_id() << "] "
+                  << request.method << " " << request.path << "\n";
+
+        auto it = request.headers.find("connection");
+        if (it != request.headers.end() && it->second == "close") {
+            keep_alive = false;
+        }
             
-            // Build and send a response.
-            HttpResponse response;
-            std::string body;
-            std::string raw;
+        // Build and send a response.
+        HttpResponse response;
+        std::string body;
+        std::string raw;
 
-            if (request.path == "/") {
-                body = "<html><body><h1>Hello from your HTTP server</h1></body></html>";
-                raw = response.build(200, body, keep_alive);
-            } else {
-                body = "<html><body><h1>404 Not Found</h1></body></html>";
-                raw = response.build(404, body, keep_alive);
-            }
-
-            write(client_fd, raw.c_str(), raw.size());
+        if (request.path == "/") {
+            body = "<html><body><h1>Hello from your HTTP server</h1></body></html>";
+            raw = response.build(200, body, keep_alive);
+        } else {
+            body = "<html><body><h1>404 Not Found</h1></body></html>";                raw = response.build(404, body, keep_alive);
         }
 
-        close(client_fd);
+         write(client_fd, raw.c_str(), raw.size());
     }
+
+    close(client_fd);
 }

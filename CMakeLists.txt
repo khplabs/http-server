@@ -12,3 +12,6 @@ add_executable(http_server
 )
 
 target_include_directories(http_server PRIVATE include)
+
+find_package(Threads REQUIRED)
+target_link_libraries(http_server PRIVATE Threads::Threads)
