@@ -13,6 +13,7 @@ add_executable(http_server
 )
 
 target_include_directories(http_server PRIVATE include)
+target_link_options(http_server PRIVATE -static-libstdc++ -static-libgcc)
 
 find_package(Threads REQUIRED)
 target_link_libraries(http_server PRIVATE Threads::Threads)
