@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <http_response.h>
 #include <http_parser.h>
+#include "file_handler.h"
 
 Server::Server(int port) : port(port), server_fd(-1) {}
 
@@ -63,10 +64,11 @@ void Server::accept_connections() {
 }
 
 void Server::client_handler(int client_fd) {
+    FileHandler file_handler("./static");
     bool keep_alive = true;
 
     while (keep_alive) {
-        char buffer[1024]{};
+        char buffer[4096]{};
         ssize_t bytes_read = read(client_fd, buffer, sizeof(buffer) - 1);
 
         if (bytes_read <= 0) break;
@@ -84,14 +86,15 @@ void Server::client_handler(int client_fd) {
             
         // Build and send a response.
         HttpResponse response;
-        std::string body;
         std::string raw;
 
-        if (request.path == "/") {
-            body = "<html><body><h1>Hello from your HTTP server</h1></body></html>";
-            raw = response.build(200, body, keep_alive);
+        FileResult file = file_handler.read(request.path);
+
+        if (file.found) {
+            raw = response.build(200, file.content, keep_alive, file.mime_type);
         } else {
-            body = "<html><body><h1>404 Not Found</h1></body></html>";                raw = response.build(404, body, keep_alive);
+            std::string body = "<html><body><h1>404 Not Found</h1></body><html>";
+            raw = response.build(404, body, keep_alive);
         }
 
          write(client_fd, raw.c_str(), raw.size());

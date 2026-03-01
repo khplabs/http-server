@@ -9,6 +9,7 @@ add_executable(http_server
     src/server.cpp
     src/http_parser.cpp
     src/http_response.cpp
+    src/file_handler.cpp
 )
 
 target_include_directories(http_server PRIVATE include)

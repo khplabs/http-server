@@ -129,6 +129,30 @@ http_server/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/http_server.dir/build.make CMakeFiles/http_server.dir/build
 .PHONY : http_server/fast
 
+src/file_handler.o: src/file_handler.cpp.o
+.PHONY : src/file_handler.o
+
+# target to build an object file
+src/file_handler.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/http_server.dir/build.make CMakeFiles/http_server.dir/src/file_handler.cpp.o
+.PHONY : src/file_handler.cpp.o
+
+src/file_handler.i: src/file_handler.cpp.i
+.PHONY : src/file_handler.i
+
+# target to preprocess a source file
+src/file_handler.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/http_server.dir/build.make CMakeFiles/http_server.dir/src/file_handler.cpp.i
+.PHONY : src/file_handler.cpp.i
+
+src/file_handler.s: src/file_handler.cpp.s
+.PHONY : src/file_handler.s
+
+# target to generate assembly for a file
+src/file_handler.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/http_server.dir/build.make CMakeFiles/http_server.dir/src/file_handler.cpp.s
+.PHONY : src/file_handler.cpp.s
+
 src/http_parser.o: src/http_parser.cpp.o
 .PHONY : src/http_parser.o
 
@@ -234,6 +258,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... http_server"
+	@echo "... src/file_handler.o"
+	@echo "... src/file_handler.i"
+	@echo "... src/file_handler.s"
 	@echo "... src/http_parser.o"
 	@echo "... src/http_parser.i"
 	@echo "... src/http_parser.s"
