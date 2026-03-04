@@ -23,31 +23,6 @@ accept() loop (main thread)
   +---> std::thread -> parse request -> serve file -> keep-alive loop -> close
 ```
 
-## Project structure
-
-```
-http-server/
-+-- include/
-|   +-- server.h          # TCP server, accept loop, thread spawning
-|   +-- http_request.h    # HttpRequest struct with headers map
-|   +-- http_parser.h     # Parses raw bytes into HttpRequest
-|   +-- http_response.h   # Builds HTTP/1.1 response strings
-|   +-- file_handler.h    # Reads static files, resolves MIME types
-+-- src/
-|   +-- main.cpp
-|   +-- server.cpp
-|   +-- http_parser.cpp
-|   +-- http_response.cpp
-|   +-- file_handler.cpp
-+-- static/               # Files served by the server
-+-- k8s/
-|   +-- deployment.yaml   # 2 replicas with liveness/readiness probes
-|   +-- service.yaml      # ClusterIP service on port 80
-|   +-- ingress.yaml      # nginx ingress routing
-+-- Dockerfile            # Multi-stage build, statically linked libstdc++
-+-- CMakeLists.txt
-```
-
 ## Build and run locally
 
 **Requirements:** CMake 3.20+, GCC or Clang with C++17 support
