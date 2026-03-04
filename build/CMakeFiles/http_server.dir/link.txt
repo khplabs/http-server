@@ -1,1 +1,0 @@
-/usr/bin/c++  -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/http_server.dir/src/main.cpp.o CMakeFiles/http_server.dir/src/server.cpp.o CMakeFiles/http_server.dir/src/http_parser.cpp.o CMakeFiles/http_server.dir/src/http_response.cpp.o CMakeFiles/http_server.dir/src/file_handler.cpp.o -o http_server
