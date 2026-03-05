@@ -59,7 +59,6 @@ void Server::accept_connections() {
 
         std::lock_guard<std::mutex> lock(threads_mutex);
         threads.emplace_back(&Server::client_handler, this, client_fd);
-        threads.back().detach();
     }
 }
 

@@ -44,5 +44,5 @@ std::string FileHandler::resolve_mime_type(const std::string& path) {
     if (file_extension == ".jpg") return "image/jpeg";
     if (file_extension == ".ico") return "image/x-icon";
 
-    return "application/octet/stream";
+    return "application/octet-stream";
 }
