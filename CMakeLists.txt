@@ -13,9 +13,11 @@ add_executable(http_server
 )
 
 target_include_directories(http_server PRIVATE include)
+
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_link_options(http_server PRIVATE -static-libstdc++ -static-libgcc)
 endif()
 
 find_package(Threads REQUIRED)
 target_link_libraries(http_server PRIVATE Threads::Threads)
+target_compile_options(http_server PRIVATE -g)
