@@ -7,8 +7,12 @@
 #include <http_response.h>
 #include <http_parser.h>
 #include "file_handler.h"
+#include <thread>
 
-Server::Server(int port) : port(port), server_fd(-1) {}
+Server::Server(int port, size_t thread_count, size_t max_queue_size) 
+    : port(port), server_fd(-1), pool(thread_count, max_queue_size, [this](int client_fd) {
+        client_handler(client_fd);
+    }) {}
 
 void Server::run() {
 
@@ -57,8 +61,10 @@ void Server::accept_connections() {
             continue;
         }
 
-        std::lock_guard<std::mutex> lock(threads_mutex);
-        threads.emplace_back(&Server::client_handler, this, client_fd);
+        if (!pool.enqueue(client_fd)) {
+            std::cerr << "Queue has reached maximum capacity, connection refused ;-)";
+            close(client_fd);
+        }
     }
 }
 
